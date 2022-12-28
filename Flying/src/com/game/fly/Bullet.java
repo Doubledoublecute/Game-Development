@@ -21,4 +21,9 @@ public class Bullet extends FlyingObject {
     public void step() {
         y -= speed; //子弹的移动
     }
+
+    @Override
+    public boolean outOfBounds() {
+        return y < -height;
+    }
 }

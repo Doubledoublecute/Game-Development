@@ -16,4 +16,14 @@ public abstract class FlyingObject {
 
     //飞行物移动
     public abstract void step();
+
+    //判断子弹是否击中飞行物
+    public boolean shootBy(Bullet bullet) {
+        int x = bullet.x;
+        int y = bullet.y;
+        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+    }
+
+    //判断是否越界
+    public abstract boolean outOfBounds();
 }

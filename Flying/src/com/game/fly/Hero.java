@@ -8,6 +8,7 @@ public class Hero extends FlyingObject {
     private int doubleFire;     //双倍火力
     private int life;           //英雄机生命值
 
+
     public Hero() {
         image = ShootGame.hero0;
         width = image.getWidth();
@@ -25,21 +26,49 @@ public class Hero extends FlyingObject {
         image = images[num];
     }
 
+
+
     //英雄机发射自当都方法
     public Bullet[] shoot() {
         int xStep = this.width / 4;
         int yStep = 20;
         if (doubleFire > 0) {  //判断是否为单倍火力
             Bullet[] bullets = new Bullet[2];
-            bullets[0] = new Bullet(this.x + 1 * xStep,this.y - yStep);
-            bullets[1] = new Bullet(this.x + 3 * xStep,this.y - yStep);
+            bullets[0] = new Bullet(this.x + 1 * xStep, this.y - yStep);
+            bullets[1] = new Bullet(this.x + 3 * xStep, this.y - yStep);
             doubleFire -= 2;
             return bullets;
 
         } else {     //如果时单倍火力
             Bullet[] bullets = new Bullet[1];
-            bullets[0] = new Bullet(this.x + 2 * xStep,this.y - yStep);
+            bullets[0] = new Bullet(this.x + 2 * xStep, this.y - yStep);
             return bullets;
         }
+    }
+
+    //为英雄机添加移动方法
+    public void moveTo(int x, int y) {
+        //注意位置都偏差，宽和高差1/2
+        this.x = x - width / 2;
+        this.y = y - height / 2;
+    }
+
+    //双倍火力
+    public void addDoubleFire() {
+        doubleFire += 40;
+    }
+
+    //增加生命
+    public void addLife() {
+        life++;
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    @Override
+    public boolean outOfBounds() {
+        return false;
     }
 }

@@ -4,6 +4,8 @@ package com.game.fly;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
@@ -89,19 +91,37 @@ public class ShootGame extends JPanel {
     public void paintScore(Graphics g) {
         g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 25));
         g.setColor(new Color(0xFF0000));
-//        g.drawString("SCORE:" + score,20,25);
-//        g.drawString("LIFE:" + hero.getLife(),20,45);
+        g.drawString("SCORE:" + score, 20, 25);
+        g.drawString("LIFE:" + hero.getLife(), 20, 45);
 //        g.drawString("TIME:" + time1,20,65);
     }
 
     //设置总的执行方法
     public void action() {
+        MouseAdapter l = new MouseAdapter() {   //设置监听
+            public void mouseMoved(MouseEvent e) {
+                if (true) {
+                    //获取鼠标坐标
+                    int x = e.getX();
+                    int y = e.getY();
+                    hero.moveTo(x, y);
+                }
+            }
+        };
+
+        //将监听器添加到面板上
+        this.addMouseListener(l);
+        this.addMouseMotionListener(l);
+
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
                 if (true) {  //state == RUNNING
                     enterAction();
                     stepAction();
+                    shootAction();
+                    bangAction();
+                    outOfBounds();
                 }
                 repaint();  //重画
             }
@@ -121,9 +141,10 @@ public class ShootGame extends JPanel {
 
     //设置飞行物进入的方法
     private int findex = 0; //设置计数器 每次调用时自增
+
     public void enterAction() {
         findex++;
-        if (findex%60 == 0){    //设置飞行物进入都频率（大概400毫秒出现一家敌机）
+        if (findex % 60 == 0) {    //设置飞行物进入都频率（大概400毫秒出现一家敌机）
             FlyingObject obj = nextOne();   //随机生成一个对象
             flyings = Arrays.copyOf(flyings, flyings.length + 1);
             flyings[flyings.length - 1] = obj;
@@ -143,6 +164,82 @@ public class ShootGame extends JPanel {
         }
     }
 
+    //发射子弹
+    int shootIndex = 0;
+
+    public void shootAction() {
+        shootIndex++;   //设置子弹发射都频率
+        if (shootIndex % 30 == 0) {
+            Bullet[] bs = hero.shoot();//调用发射子弹都方法
+            bullets = Arrays.copyOf(bullets, bullets.length + bs.length);//数组扩容
+            System.arraycopy(bs, 0, bullets, bullets.length - bs.length, bs.length);
+        }
+    }
+
+    int score = 0;
+    static double time = 0.00;
+    static int time1 = 0;
+
+    //遍历每一颗子弹
+    public void bangAction() {
+        for (int i = 0; i < bullets.length; i++) {
+            Bullet b = bullets[i];
+            bang(b);
+        }
+    }
+
+    public void bang(Bullet b) {
+        int index = -1; //击中飞行物的索引（判断击中的是哪一个飞行物）
+        for (int i = 0; i < flyings.length; i++) {  //遍历每一个飞行物
+            if (flyings[i].shootBy(b)) { //调用shootBy方法 判断子弹和敌人是否发生碰撞
+                index = i;  //记录被击中的飞行物的下标
+                break;
+            }
+        }
+        //击中
+        if (index != -1) {
+            FlyingObject one = flyings[index];  //把击中都飞行物赋值给one
+            flyings[index] = flyings[flyings.length - 1];//把击中的飞行物和数组中最后一个
+            flyings = Arrays.copyOf(flyings, flyings.length - 1);//删除掉数组中最后一个元素
+
+            if (one instanceof Enemy) {  //击中敌机
+                score += ((Enemy) one).getScore();
+            } else if (one instanceof Award) { //击中蜜蜂
+                int type = ((Award) one).getType();
+                switch (type) {
+                    case Award.DOUBLE_FIRE:
+                        hero.addDoubleFire();
+                        break;
+                    case Award.LIFE:
+                        hero.addLife();
+                        break;
+                }
+            }
+        }
+    }
+
+
+    //删除越界飞行物
+    public void outOfBounds() {
+        int index = 0;
+        FlyingObject[] flyingLives = {};
+        for (int i = 0; i < flyings.length; i++) {
+            if (!flyings[i].outOfBounds()) {
+                flyingLives = Arrays.copyOf(flyingLives, flyingLives.length + 1);
+                flyingLives[index++] = flyings[i];
+            }
+        }
+        flyings = Arrays.copyOf(flyingLives, flyingLives.length);
+
+        index = 0;
+        Bullet[] bulletLives = new Bullet[bullets.length];
+        for (int i = 0; i < bullets.length; i++) {
+            if (!bullets[i].outOfBounds()) {
+                bulletLives[index++] = bullets[i];
+            }
+        }
+        bullets = Arrays.copyOf(bulletLives, index);
+    }
 
     public static void main(String[] args) {
         //创建窗体

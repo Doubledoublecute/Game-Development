@@ -22,11 +22,16 @@ public class Airplane extends FlyingObject implements Enemy {
     @Override
     public int getScore() {
 
-        return 0;
+        return 15;
     }
 
     @Override
     public void step() {
         y += speed;
+    }
+
+    @Override
+    public boolean outOfBounds() {
+        return y > ShootGame.HEIGHT;
     }
 }
