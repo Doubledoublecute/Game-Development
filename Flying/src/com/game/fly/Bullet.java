@@ -19,6 +19,6 @@ public class Bullet extends FlyingObject {
 
     @Override
     public void step() {
-
+        y -= speed; //子弹的移动
     }
 }

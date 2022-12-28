@@ -16,7 +16,7 @@ public class Airplane extends FlyingObject implements Enemy {
         height = image.getHeight();      //获取高度
         y = 0;//初始位置
         Random rad = new Random();
-        x = rad.nextInt(0,ShootGame.WIDTH - width);//确定生成位置
+        x = rad.nextInt(0, ShootGame.WIDTH - width);//确定生成位置
     }
 
     @Override
@@ -27,6 +27,6 @@ public class Airplane extends FlyingObject implements Enemy {
 
     @Override
     public void step() {
-
+        y += speed;
     }
 }

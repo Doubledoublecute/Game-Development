@@ -20,8 +20,26 @@ public class Hero extends FlyingObject {
     }
 
     @Override
-    public void step(){
+    public void step() {
         int num = index++ / 2 % images.length;
         image = images[num];
+    }
+
+    //英雄机发射自当都方法
+    public Bullet[] shoot() {
+        int xStep = this.width / 4;
+        int yStep = 20;
+        if (doubleFire > 0) {  //判断是否为单倍火力
+            Bullet[] bullets = new Bullet[2];
+            bullets[0] = new Bullet(this.x + 1 * xStep,this.y - yStep);
+            bullets[1] = new Bullet(this.x + 3 * xStep,this.y - yStep);
+            doubleFire -= 2;
+            return bullets;
+
+        } else {     //如果时单倍火力
+            Bullet[] bullets = new Bullet[1];
+            bullets[0] = new Bullet(this.x + 2 * xStep,this.y - yStep);
+            return bullets;
+        }
     }
 }

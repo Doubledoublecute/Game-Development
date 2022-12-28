@@ -14,5 +14,6 @@ public abstract class FlyingObject {
     protected int y;                      //y坐标
     protected BufferedImage image;        //图片
 
+    //飞行物移动
     public abstract void step();
 }

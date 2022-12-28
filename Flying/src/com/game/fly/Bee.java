@@ -27,6 +27,12 @@ public class Bee extends FlyingObject implements Award {
 
     @Override
     public void step() {
-
+        y += ySpeed;
+        x += xSpeed;
+        if (x < 0) {
+            xSpeed = 1;
+        } else if (x > ShootGame.WIDTH - width) {
+            xSpeed = -1;
+        }
     }
 }

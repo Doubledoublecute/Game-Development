@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -86,7 +87,7 @@ public class ShootGame extends JPanel {
 
     //画得分
     public void paintScore(Graphics g) {
-        g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 25));
         g.setColor(new Color(0xFF0000));
 //        g.drawString("SCORE:" + score,20,25);
 //        g.drawString("LIFE:" + hero.getLife(),20,45);
@@ -99,7 +100,8 @@ public class ShootGame extends JPanel {
         timer.schedule(new TimerTask() {
             public void run() {
                 if (true) {  //state == RUNNING
-
+                    enterAction();
+                    stepAction();
                 }
                 repaint();  //重画
             }
@@ -118,14 +120,33 @@ public class ShootGame extends JPanel {
     }
 
     //设置飞行物进入的方法
+    private int findex = 0; //设置计数器 每次调用时自增
     public void enterAction() {
+        findex++;
+        if (findex%60 == 0){    //设置飞行物进入都频率（大概400毫秒出现一家敌机）
+            FlyingObject obj = nextOne();   //随机生成一个对象
+            flyings = Arrays.copyOf(flyings, flyings.length + 1);
+            flyings[flyings.length - 1] = obj;
+        }
+    }
 
+    //飞行物的移动
+    public void stepAction() {
+        hero.step();
+        //让每一架敌机和蜜蜂都往前走一步
+        for (int i = 0; i < flyings.length; i++) {
+            flyings[i].step();
+        }
+        //让每个子弹都往前走一步
+        for (int i = 0; i < bullets.length; i++) {
+            bullets[i].step();
+        }
     }
 
 
     public static void main(String[] args) {
         //创建窗体
-        JFrame frame = new JFrame("飞机✈️✈️✈️大战");
+        JFrame frame = new JFrame("飞机大战");
 
         //创建面板
         ShootGame game = new ShootGame();
