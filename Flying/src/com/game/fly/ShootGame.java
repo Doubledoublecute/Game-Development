@@ -35,6 +35,13 @@ public class ShootGame extends JPanel {
 
     public Bullet[] bullets = {};           //子弹对象
 
+    private int score = 0;
+    private int state;  //状态
+    public static final int START = 0;
+    public static final int RUNNING = 1;
+    public static final int PAUSE = 2;
+    public static final int GAME_OVER = 3;
+
     public ShootGame() {
         flyings = new FlyingObject[2];
         flyings[0] = new Airplane();
@@ -65,6 +72,7 @@ public class ShootGame extends JPanel {
         paintHero(g);
         paintBullets(g);
         paintScore(g);
+        paintState(g);
     }
 
     //画敌机和蜜蜂
@@ -96,17 +104,63 @@ public class ShootGame extends JPanel {
 //        g.drawString("TIME:" + time1,20,65);
     }
 
+    //画状态
+    public void paintState(Graphics g) {
+        switch (state) {
+            case START:
+                g.drawImage(start, 0, 0, null);
+                break;
+            case PAUSE:
+                g.drawImage(pause, 0, 0, null);
+                break;
+            case GAME_OVER:
+                g.drawImage(gameover, 0, 0, null);
+                break;
+        }
+    }
+
     //设置总的执行方法
     public void action() {
         MouseAdapter l = new MouseAdapter() {   //设置监听
             public void mouseMoved(MouseEvent e) {
-                if (true) {
+                if (state == RUNNING) {
                     //获取鼠标坐标
                     int x = e.getX();
                     int y = e.getY();
                     hero.moveTo(x, y);
                 }
             }
+
+            //鼠标点击监听
+            public void mouseClicked(MouseEvent e) {
+                switch (state) {
+                    case START:
+                        state = RUNNING;//状态变成运行状态
+                        break;
+                    case GAME_OVER:
+                        hero = new Hero();  //重新加载一个英雄机对象
+                        flyings = new FlyingObject[0];  //飞行物数组清零
+                        bullets = new Bullet[0];    //子弹数组清零
+                        score = 0;  //得分清零
+                        state = START;  //状态要设置
+                        break;
+                }
+            }
+
+            //暂停操作第一步 变成暂停状态
+            public void mouseExited(MouseEvent e) {
+                if (state != GAME_OVER) {    //游戏没有结束的情况下 才能暂停
+                    state = PAUSE;
+                }
+            }
+
+            //暂停操作第二部 变成运行状态
+            public void mouseEntered(MouseEvent e) {
+                if (state == PAUSE) {    //暂停状态下 把鼠标移回窗体 变为运行状态
+                    state = RUNNING;
+                }
+            }
+
         };
 
         //将监听器添加到面板上
@@ -116,13 +170,13 @@ public class ShootGame extends JPanel {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
-                if (true) {  //state == RUNNING
+                if (state == RUNNING) {  //state == RUNNING
                     enterAction();
                     stepAction();
                     shootAction();
                     bangAction();
                     outOfBounds();
-                    isGameOver();
+                    checkGameOverAction();
                 }
                 repaint();  //重画
             }
@@ -177,9 +231,6 @@ public class ShootGame extends JPanel {
         }
     }
 
-    int score = 0;
-    static double time = 0.00;
-    static int time1 = 0;
 
     //遍历每一颗子弹
     public void bangAction() {
@@ -261,7 +312,13 @@ public class ShootGame extends JPanel {
                 flyings = Arrays.copyOf(flyings, flyings.length - 1); //数值缩容
             }
         }
-        return false;
+        return hero.getLife() <= 0;
+    }
+
+    public void checkGameOverAction() {
+        if (isGameOver()) {
+            state = GAME_OVER;
+        }
     }
 
     public static void main(String[] args) {
