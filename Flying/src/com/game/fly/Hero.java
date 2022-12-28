@@ -27,7 +27,6 @@ public class Hero extends FlyingObject {
     }
 
 
-
     //英雄机发射自当都方法
     public Bullet[] shoot() {
         int xStep = this.width / 4;
@@ -44,6 +43,18 @@ public class Hero extends FlyingObject {
             bullets[0] = new Bullet(this.x + 2 * xStep, this.y - yStep);
             return bullets;
         }
+    }
+
+    //英雄机的碰撞判断
+    public boolean hit(FlyingObject enemy) {      //注意有参的方法
+        int x1 = enemy.x - this.width / 2;
+        int x2 = enemy.x + enemy.width + this.width / 2;
+        int y1 = enemy.y - this.height / 2;
+        int y2 = enemy.y + enemy.height + this.height / 2;
+        int heroX = this.x + this.width / 2;
+        int heroY = this.y + this.height / 2;
+
+        return heroX > x1 && heroX < x2 && heroY > y1 && heroY < y2;
     }
 
     //为英雄机添加移动方法
@@ -71,4 +82,15 @@ public class Hero extends FlyingObject {
     public boolean outOfBounds() {
         return false;
     }
+
+    //对生命值做减法
+    public void subStractLife() {
+        life--;
+    }
+
+    //将双倍火力变单倍火力（通过参数传递的方法实现）
+    public void setDoubleFire(int doubleFire) {
+        this.doubleFire = doubleFire;   //之后要传递参数0过来 将doubleFire设置为0
+    }
+
 }

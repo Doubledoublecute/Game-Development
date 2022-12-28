@@ -122,6 +122,7 @@ public class ShootGame extends JPanel {
                     shootAction();
                     bangAction();
                     outOfBounds();
+                    isGameOver();
                 }
                 repaint();  //重画
             }
@@ -239,6 +240,28 @@ public class ShootGame extends JPanel {
             }
         }
         bullets = Arrays.copyOf(bulletLives, index);
+    }
+
+    //判断是否发生碰撞并进行删除 和 对应的惩罚措施
+    public boolean isGameOver() {
+        //遍历所有飞行物
+        for (int i = 0; i < flyings.length; i++) {
+            int index = -1; //标记被碰撞的飞行物
+            FlyingObject obj = flyings[i];  //每一个飞行物
+            if (hero.hit(obj)) {
+                hero.subStractLife();   //减少一个命
+                hero.setDoubleFire(0);  //设置为单倍火力
+                index = i;
+            }
+            //删除掉被碰撞的飞行物
+            if (index != -1) {
+                FlyingObject t = flyings[index];
+                flyings[index] = flyings[flyings.length - 1];
+                flyings[flyings.length - 1] = t;
+                flyings = Arrays.copyOf(flyings, flyings.length - 1); //数值缩容
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
